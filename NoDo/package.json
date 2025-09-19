@@ -1,0 +1,13 @@
+{
+  "name": "nodo",
+  "private": true,
+  "version": "0.0.1",
+  "workspaces": [
+    "aggregator-api",
+    "web-client",
+    "scripts"
+  ],
+  "devDependencies": {
+    "snarkjs": "^0.7.5"
+  }
+}
