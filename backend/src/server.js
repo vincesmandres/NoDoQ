@@ -1,10 +1,9 @@
-require('dotenv').config();
-const app = require('./app');
-const { logger } = require('./utils/logger');
-const config = require('./config');
+import express from "express";
+import routes from "./routes.js";
 
-const PORT = config.PORT || 4000;
+const app = express();
+app.use(express.json());
+app.use("/api", routes);
 
-app.listen(PORT, () => {
-  logger.info(`NoDo backend listening on port ${PORT}`);
-});
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`Backend corriendo en puerto ${PORT}`));
