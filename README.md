@@ -1,4 +1,4 @@
-# NoDoQ 🇪🇨
+# NoDoQ
 
 > Nodo → blockchain.  
 > No doble → nullifiers que garantizan **una persona, un voto**.
@@ -10,7 +10,7 @@ sin revelar su identidad ni su ubicación.
 
 ---
 
-## 🌱 Idea
+## Idea
 
 - **ZK Membership + Nullifier** → pertenencia + unicidad.  
 - **Walletless login (Auth3)** → UX accesible sin necesidad de wallets cripto.  
@@ -19,7 +19,7 @@ sin revelar su identidad ni su ubicación.
 
 ---
 
-## 🔑 Flujo demo
+## Flujo demo
 
 1. Login vía Auth3 (ej: SMS / social login).  
 2. El sistema emite una credencial verificable (VC) de pertenencia al padrón de la parroquia.  
@@ -30,7 +30,7 @@ sin revelar su identidad ni su ubicación.
 
 ---
 
-## 🛠️ Stack
+## Stack
 
 - **ZK:** Circom + snarkjs (PLONK/ultraPlonk) o Noir  
 - **Hash:** Poseidon  
@@ -41,7 +41,7 @@ sin revelar su identidad ni su ubicación.
 
 ---
 
-## ⚙️ Instalación y Setup (Codespaces)
+## Instalación y Setup (Codespaces)
 
 ### 1. Dependencias del sistema
 ```bash
@@ -99,7 +99,7 @@ NoDoQ/
 
 ---
 
-## 🧪 Próximos pasos
+## Próximos pasos
 
 - [ ] **Paso 8**: compilar circuito base `membership.circom` con Circom y snarkjs.  
 - [ ] **Paso 9**: levantar API mínima (`aggregator-api`) y conectar con Redis.  
@@ -109,7 +109,7 @@ NoDoQ/
 
 ---
 
-## ⚡ Estado
+## Estado
 
 MVP en construcción – Hackatón interno del **ZKET Core Program Ecuador 2025**.  
 Objetivo: demo funcional de votación barrial con ZK, Auth3 y anclaje en zkEVM testnet.  
