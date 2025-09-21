@@ -1,11 +1,16 @@
 "use client";
-import { ConnectButton } from "@mysten/dapp-kit";
+import LoginCard from "@/components/LoginCard";
+import BallotCard from "@/components/BallotCard";
+import ProofCard from "@/components/ProofCard";
+import ResultsCard from "@/components/ResultsCard";
 
 export default function Page() {
   return (
-    <main style={{ padding: 24 }}>
-      <h1>NoDoQ — Frontend</h1>
-      <ConnectButton />
+    <main className="grid">
+      <LoginCard />
+      <BallotCard />
+      <ProofCard />
+      <ResultsCard />
     </main>
   );
 }
