@@ -1,58 +1,72 @@
-const uuid = require('uuid').v4;
-const redis = require('../redis');
+// /backend/src/controllers/voteController.js
+const { verifySemaphoreProof } = require('../zk/verifier');
+const maci = require('../services/maciCoordinator');
 const db = require('../db');
-const config = require('../config');
-const { verifyProof } = require('../zk/verifier');
 const { logger } = require('../utils/logger');
 
 /**
- * submitVote: verifies proof off-chain, checks nullifier, persists vote, queues for batch
+ * semaphoreSubmit:
+ * Body:
+ * {
+ *   pollId: string,
+ *   proof: { ... },           // semaphore proof object
+ *   publicSignals: [...],
+ *   message: { option: 'A', identityCommitment: '...', ... }
+ * }
  */
-async function submitVote(req, res, next) {
+async function semaphoreSubmit(req, res, next) {
   try {
-    const { root, nullifier, proof, publicSignals, pollId, encryptedVote } = req.body;
-    if (!nullifier || !proof || !publicSignals || !pollId || !encryptedVote || !root) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    const { pollId, proof, publicSignals, message } = req.body;
+    if (!pollId || !proof || !publicSignals || !message) {
+      return res.status(400).json({ error: 'Missing fields' });
     }
 
-    // 1) Verify the ZK proof using snarkjs (off-chain)
-    const valid = await verifyProof({ proof, publicSignals, root });
-    if (!valid) {
-      return res.status(400).json({ error: 'Invalid proof' });
+    // 1) Verify semaphore proof
+    const ok = await verifySemaphoreProof({ proof, publicSignals });
+    if (!ok) {
+      return res.status(400).json({ error: 'Invalid Semaphore proof' });
     }
 
-    // 2) Check nullifier in Redis set for this pollId
-    const nullifierKey = `nullifiers:${pollId}`;
-    const exists = await redis.sismember(nullifierKey, nullifier);
-    if (exists) {
-      return res.status(409).json({ error: 'Nullifier already used — duplicate vote' });
+    // 2) The client passes identityCommitment inside message (or you can derive from publicSignals)
+    const identityCommitment = message.identityCommitment;
+    if (!identityCommitment) return res.status(400).json({ error: 'Missing identityCommitment in message' });
+
+    // 3) Pass message to MACI coordinator to process (ensures nullifier/one-vote-per-identity)
+    try {
+      const r = await maci.processMessage({ pollId, identityCommitment, message });
+      return res.status(201).json({ status: 'accepted', id: r.id });
+    } catch (err) {
+      return res.status(409).json({ error: err.message });
     }
-
-    // 3) Mark nullifier (use SADD)
-    await redis.sadd(nullifierKey, nullifier);
-
-    // Optionally set a TTL on nullifiers for the poll duration (e.g., 7 days)
-    // await redis.expire(nullifierKey, 60*60*24*7);
-
-    // 4) Persist vote in Postgres (store encryptedVote and nullifier)
-    const voteId = uuid();
-    const now = new Date();
-    const insert = `INSERT INTO votes(id, poll_id, nullifier, root, encrypted_vote, created_at)
-                    VALUES($1,$2,$3,$4,$5,$6) RETURNING id, created_at`;
-    const values = [voteId, pollId, nullifier, root, encryptedVote, now];
-    const result = await db.query(insert, values);
-
-    // 5) push into a queue list to be batched (Redis list)
-    const queueKey = `votequeue:${pollId}`;
-    const queueItem = JSON.stringify({ id: voteId, pollId, nullifier, root, encryptedVote, created_at: now.toISOString() });
-    await redis.rpush(queueKey, queueItem);
-
-    logger.info({ voteId, pollId }, 'Vote accepted and queued');
-
-    return res.status(201).json({ status: 'accepted', voteId, created_at: result.rows[0].created_at });
   } catch (err) {
     next(err);
   }
 }
 
-module.exports = { submitVote };
+async function getGroupInfo(req, res, next) {
+  try {
+    // For the frontend proof generation we need to provide group leaves and merkle root.
+    // For MVP, return leaves from DB (identity commitments recorded) and a mock root.
+    const pollId = req.query.pollId || 'poll-1';
+
+    // Query DB for group of allowed identity commitments — for a real system this will be the voter registry.
+    const result = await db.query(`SELECT identity_commitment FROM voter_registry WHERE poll_id = $1`, [pollId]);
+    const leaves = result.rows.map(r => r.identity_commitment);
+
+    // For convenience compute a simple merkle root placeholder (in production compute real merkle root)
+    const merkleRoot = leaves.length ? require('crypto').createHash('sha256').update(leaves.join('|')).digest('hex') : '0';
+
+    res.json({
+      pollId,
+      merkleRoot,
+      depth: 16,
+      leaves,
+      externalNullifier: 1,
+      groupId: pollId
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { semaphoreSubmit, getGroupInfo };

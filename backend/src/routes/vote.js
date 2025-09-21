@@ -1,18 +1,12 @@
+// /backend/src/routes/vote.js
 const express = require('express');
 const router = express.Router();
 const voteController = require('../controllers/voteController');
 
-/**
- * POST /api/vote/submit
- * Body: {
- *   root: string (hex decimal string or numeric string),
- *   nullifier: string,
- *   proof: object OR base64/hex bytes,
- *   publicSignals: array,
- *   pollId: string,
- *   encryptedVote: string (opaque ciphertext)
- * }
- */
-router.post('/submit', voteController.submitVote);
+// New endpoint for Semaphore + MACI flow
+router.post('/semaphore-submit', voteController.semaphoreSubmit);
+
+// Optional: for client to obtain group info for proof generation
+router.get('/get-group', voteController.getGroupInfo);
 
 module.exports = router;
