@@ -1,3 +1,18 @@
+# Web-Client
+
+## Ejecución
+
+1. Entrar a web-client
+cd web-client
+2. Instalar node
+npm intall
+3. Installar ethers para Metamask
+npm install ethers
+4. Ejecutar
+npm run dev
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
