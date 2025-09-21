@@ -1,8 +1,0 @@
-node_modules/
-.env
-build/
-.cache/
-dist/
-*.zkey
-*.r1cs
-*.sym

@@ -5,6 +5,7 @@
 - IVerifier.sol -> interface expected from an on-chain verifier (PLONK, etc.)
 - VerifierStub.sol -> a development stub that returns `true` for any proof (replace in prod)
 - NoDoAnchor.sol -> main anchoring contract: anchors batch root + batchHash; optionally verifies ZK proof
+- artifacts/ -> ABI y metadata compilada (`build-info/`) generada por Hardhat/Foundry
 
 
 ## Notas importantes:
