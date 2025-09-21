@@ -1,0 +1,84 @@
+{
+	"compiler": {
+		"version": "0.8.30+commit.73712a01"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "proof",
+						"type": "bytes"
+					},
+					{
+						"internalType": "uint256[]",
+						"name": "pubSignals",
+						"type": "uint256[]"
+					}
+				],
+				"name": "verify",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "valid",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {
+				"verify(bytes,uint256[])": {
+					"params": {
+						"proof": "Serialized proof bytes as produced by the prover/verifier library",
+						"pubSignals": "Public signals (as uint256 array) that the verifier expects"
+					},
+					"returns": {
+						"valid": "True if the proof verifies"
+					}
+				}
+			},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {
+				"verify(bytes,uint256[])": {
+					"notice": "Verify a proof on-chain"
+				}
+			},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/IVerifier.sol": "IVerifier"
+		},
+		"evmVersion": "prague",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/IVerifier.sol": {
+			"keccak256": "0x5e795ee3430f40e5a4ad68630c0335eac1bca8cb9d505322c7dacdd3aa5acc89",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1168e5cc06001dad34435dd361d96b3392d71b53322561c7ab9ae702739dbc01",
+				"dweb:/ipfs/QmTfRn2ZUxy8dUyZNhAM6WkKFEML2ANfUABBK3oavJvs2Y"
+			]
+		}
+	},
+	"version": 1
+}
