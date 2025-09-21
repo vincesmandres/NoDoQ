@@ -45,7 +45,7 @@ async function semaphoreSubmit(req, res, next) {
 
 async function getGroupInfo(req, res, next) {
   try {
-    // For the frontend proof generation we need to provide group leaves and merkle root.
+    // For the web client proof generation we need to provide group leaves and merkle root.
     // For MVP, return leaves from DB (identity commitments recorded) and a mock root.
     const pollId = req.query.pollId || 'poll-1';
 

@@ -81,28 +81,28 @@ curl -L https://raw.githubusercontent.com/iden3/snarkjs/master/ptau/powersOfTau2
 
 ```
 NoDoQ/
-├─ circuits/         # circuitos ZK
-│   └─ membership.circom
-├─ contracts/        # contratos Solidity
-│   └─ NoDoAnchor.sol
-├─ prover/           # snarkjs setup + build
-│   └─ build/
-├─ aggregator-api/   # backend Node/Express
-│   └─ src/index.ts
-├─ web-client/       # Next.js/React PWA
-│   └─ src/app/page.tsx
-├─ scripts/          # helpers de despliegue
+├─ backend/          # servicio aggregator (Node/Express)
+│   └─ src/
+├─ contracts/        # contratos Solidity y artefactos compilados
+│   ├─ artifacts/    # ABI + build-info del ancla/verificador
+│   └─ *.sol
+├─ web-client/       # cliente web (Next.js/React)
+│   └─ src/
+├─ zk/               # circuitos y utilidades de pruebas ZK
+│   ├─ circuits/
+│   └─ prover-wasm/
 ├─ README.md
-├─ .gitignore
 └─ LICENSE
 ```
+
+> 🧹 **Limpieza de legado**: el antiguo `frontend/` (Next.js 13), los artefactos de contratos en la raíz y el workspace `NoDo/` de pnpm fueron retirados. Toda la app web vive en `web-client/` y los ABI/artefactos se centralizan ahora en `contracts/artifacts/`.
 
 ---
 
 ## Próximos pasos
 
 - [ ] **Paso 8**: compilar circuito base `membership.circom` con Circom y snarkjs.  
-- [ ] **Paso 9**: levantar API mínima (`aggregator-api`) y conectar con Redis.  
+- [ ] **Paso 9**: levantar API mínima (`backend`) y conectar con Redis.
 - [ ] **Paso 10**: crear cliente web (Next.js) con botón de prueba (fake proof).  
 - [ ] **Paso 11+**: integrar pruebas reales (`wasm` + `zkey`) y verificar off-chain.  
 - [ ] **Paso 12**: exportar contrato verificador y probar en zkEVM testnet.  
