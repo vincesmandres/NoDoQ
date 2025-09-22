@@ -1,0 +1,77 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\User\\Desktop\\NoDoQ\\contracts\\src\\IGroth16Verifier.sol": {
+      "lastModificationDate": 1758509025110,
+      "contentHash": "382a586a063426e1bed708fb3fd7c781",
+      "sourceName": "src/IGroth16Verifier.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "IGroth16Verifier"
+      ]
+    },
+    "C:\\Users\\User\\Desktop\\NoDoQ\\contracts\\src\\MockVerifier.sol": {
+      "lastModificationDate": 1758509135800,
+      "contentHash": "3c4312d8a43cd983c649872f23a35fb5",
+      "sourceName": "src/MockVerifier.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IGroth16Verifier.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "MockVerifier"
+      ]
+    }
+  }
+}

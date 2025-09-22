@@ -1,9 +1,7 @@
 {
   "scripts": {
-    "zk:compile": "ts-node zk/scripts/compile.ts",
-    "contracts:build": "hardhat compile",
-    "contracts:deploy": "hardhat run scripts/deploy.ts --network <network>",
-    "app:dev": "pnpm --filter app dev",
-    "app:build": "pnpm --filter app build"
+    "zk:compile": "ts-node scripts/compile.ts",
+    "zk:test": "ts-node tests/prove-and-verify-local.ts",
+    "zk:quickcheck": "pnpm zk:compile && pnpm zk:test"
   }
 }

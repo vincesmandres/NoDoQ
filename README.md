@@ -110,7 +110,39 @@ NoDoQ/
 
 ---
 
+## ZK Quickcheck
+
+Para verificar que el circuito ZK funciona correctamente:
+
+### 1. Compilar circuito con Groth16
+```bash
+cd zk
+pnpm zk:compile
+```
+
+### 2. Ejecutar prueba local completa
+```bash
+cd zk
+pnpm zk:test
+```
+
+### 3. Ejecutar quickcheck (compila + prueba)
+```bash
+cd zk
+pnpm zk:quickcheck
+```
+
+**Resultado esperado**: El comando debe imprimir `LOCAL_ZK_OK - Proof verification successful!`
+
+### Archivos generados
+- `zk/build/test.r1cs` - Restricciones del circuito
+- `zk/build/test_js/test.wasm` - WebAssembly para el navegador
+- `zk/build/test.zkey` - Clave de prueba Groth16
+- `zk/build/verification_key.json` - Clave de verificación
+
+---
+
 ## Estado
 
-MVP en construcción – Hackatón interno del **ZKET Core Program Ecuador 2025**.  
-Objetivo: demo funcional de votación barrial con ZK, Auth3 y anclaje en zkEVM testnet.  
+MVP en construcción – Hackatón interno del **ZKET Core Program Ecuador 2025**.
+Objetivo: demo funcional de votación barrial con ZK, Auth3 y anclaje en zkEVM testnet.

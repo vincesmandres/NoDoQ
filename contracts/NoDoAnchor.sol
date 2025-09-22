@@ -1,41 +1,55 @@
-// Contract responsible for anchoring vote batches on-chain and exposing events for audit.
-// Stores minimal metadata and optionally verifies a ZK proof before accepting an anchor.
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "./IVerifier.sol";
+import "./IGroth16Verifier.sol";
 
+/**
+ * @title NoDoAnchor
+ * @dev Contract for anchoring ZK-based votes on-chain with nullifier protection
+ *
+ * This contract prevents double voting by tracking used nullifiers and verifies
+ * Groth16 zero-knowledge proofs before accepting votes.
+ *
+ * Public signals mapping (4 signals):
+ * - publicInputs[0] = root (Merkle root of the membership tree)
+ * - publicInputs[1] = nullifierHash (unique identifier for this vote)
+ * - publicInputs[2] = signalHash (hash of the vote signal)
+ * - publicInputs[3] = externalNullifier (prevents replay across different polls)
+ */
 contract NoDoAnchor {
     address public owner;
-    IVerifier public verifier;
-    bool public requireProof;
+    IGroth16Verifier public verifier;
 
-    struct Batch {
-        bytes32 root; // Merkle root or aggregated root representing the batch
-        bytes32 batchHash; // Hash of the batch contents (off-chain storage like IPFS)
-        string metadata; // Optional metadata or IPFS link
-        address submitter; // who anchored the batch
-        uint256 blockNumber; // block number when anchored
-        uint256 timestamp; // block timestamp
+    // Track used nullifiers to prevent double voting
+    mapping(uint256 => bool) public usedNullifiers;
+
+    // Vote data structure
+    struct Vote {
+        bytes32 root;           // Merkle root of membership tree
+        uint256 nullifierHash;  // Unique vote identifier
+        uint256 signalHash;     // Hash of the vote signal
+        uint256 externalNullifier; // Poll identifier (prevents replay)
+        address voter;          // Address of the voter
+        uint256 blockNumber;    // Block number when vote was cast
+        uint256 timestamp;      // Timestamp when vote was cast
     }
 
-    // batchId => Batch
-    mapping(bytes32 => Batch) public batches;
+    // externalNullifier => array of votes
+    mapping(uint256 => Vote[]) public pollVotes;
 
-    event VoteAnchored(
-        bytes32 indexed root,
-        bytes32 indexed batchHash,
-        string metadata,
-        address indexed submitter,
-        uint256 blockNumber,
-        uint256 timestamp
+    event VoteCast(
+        uint256 indexed externalNullifier,
+        uint256 indexed nullifierHash,
+        bytes32 root,
+        uint256 signalHash,
+        address indexed voter
     );
+
     event VerifierUpdated(
         address indexed oldVerifier,
         address indexed newVerifier
     );
-    event RequireProofUpdated(bool oldValue, bool newValue);
+
     event OwnershipTransferred(
         address indexed oldOwner,
         address indexed newOwner
@@ -46,58 +60,79 @@ contract NoDoAnchor {
         _;
     }
 
-    constructor(address _verifier, bool _requireProof) {
+    constructor(address _verifier) {
         owner = msg.sender;
-        verifier = IVerifier(_verifier);
-        requireProof = _requireProof;
+        verifier = IGroth16Verifier(_verifier);
     }
 
-    /// @notice Anchor a vote batch on-chain. Optionally verifies a zk-proof before accepting.
-    /// @param proof Serialized proof bytes (if requireProof == true). If not required, can be empty.
-    /// @param pubSignals Public signals expected by verifier (as uint256[]). If not required, can be empty array.
-    /// @param root The Merkle root or aggregated root representing the batch.
-    /// @param batchHash Off-chain batch hash (e.g., IPFS CID hashed to bytes32) to reference stored proofs and data.
-    /// @param metadata Optional short metadata or pointer (e.g., IPFS CID in string form).
-    function anchorVoteBatch(
-        bytes calldata proof,
-        uint256[] calldata pubSignals,
+    /**
+     * @notice Anchor a single ZK-verified vote on-chain
+     * @param proof_a First part of the Groth16 proof (G1 point)
+     * @param proof_b Second part of the Groth16 proof (G2 point)
+     * @param proof_c Third part of the Groth16 proof (G1 point)
+     * @param root Merkle root of the membership tree
+     * @param nullifierHash Unique identifier for this vote (prevents double voting)
+     * @param signalHash Hash of the vote signal
+     * @param externalNullifier Poll identifier (prevents replay across polls)
+     */
+    function anchor(
+        uint256[2] calldata proof_a,
+        uint256[2][2] calldata proof_b,
+        uint256[2] calldata proof_c,
         bytes32 root,
-        bytes32 batchHash,
-        string calldata metadata
+        uint256 nullifierHash,
+        uint256 signalHash,
+        uint256 externalNullifier
     ) external {
-        Batch memory b = Batch({
+        // Check if nullifier has already been used (prevent double voting)
+        require(!usedNullifiers[nullifierHash], "NoDoAnchor: nullifier already used");
+
+        // Construct public inputs array in the correct order
+        // publicInputs[0] = root
+        // publicInputs[1] = nullifierHash
+        // publicInputs[2] = signalHash
+        // publicInputs[3] = externalNullifier
+        uint256[] memory publicInputs = new uint256[](4);
+        publicInputs[0] = uint256(root);
+        publicInputs[1] = nullifierHash;
+        publicInputs[2] = signalHash;
+        publicInputs[3] = externalNullifier;
+
+        // Verify the ZK proof
+        require(verifier.verifyProof(proof_a, proof_b, proof_c, publicInputs),
+            "NoDoAnchor: invalid proof");
+
+        // Mark nullifier as used
+        usedNullifiers[nullifierHash] = true;
+
+        // Store the vote
+        Vote memory vote = Vote({
             root: root,
-            batchHash: batchHash,
-            metadata: metadata,
-            submitter: msg.sender,
+            nullifierHash: nullifierHash,
+            signalHash: signalHash,
+            externalNullifier: externalNullifier,
+            voter: msg.sender,
             blockNumber: block.number,
             timestamp: block.timestamp
         });
 
-        batches[batchHash] = b;
+        pollVotes[externalNullifier].push(vote);
 
-        emit VoteAnchored(
+        // Emit event
+        emit VoteCast(
+            externalNullifier,
+            nullifierHash,
             root,
-            batchHash,
-            metadata,
-            msg.sender,
-            b.blockNumber,
-            b.timestamp
+            signalHash,
+            msg.sender
         );
     }
 
     /// @notice Update the verifier contract address (admin only).
     function setVerifier(address _verifier) external onlyOwner {
         address old = address(verifier);
-        verifier = IVerifier(_verifier);
+        verifier = IGroth16Verifier(_verifier);
         emit VerifierUpdated(old, _verifier);
-    }
-
-    /// @notice Toggle whether proofs are required to anchor batches.
-    function setRequireProof(bool _require) external onlyOwner {
-        bool old = requireProof;
-        requireProof = _require;
-        emit RequireProofUpdated(old, _require);
     }
 
     /// @notice Transfer ownership
@@ -108,8 +143,24 @@ contract NoDoAnchor {
         emit OwnershipTransferred(old, newOwner);
     }
 
-    /// @notice Helper to fetch batch information
-    function getBatch(bytes32 batchHash) external view returns (Batch memory) {
-        return batches[batchHash];
+    /// @notice Get votes for a specific poll
+    /// @param externalNullifier The poll identifier
+    /// @return Array of votes for the poll
+    function getPollVotes(uint256 externalNullifier) external view returns (Vote[] memory) {
+        return pollVotes[externalNullifier];
+    }
+
+    /// @notice Get total number of votes for a poll
+    /// @param externalNullifier The poll identifier
+    /// @return Number of votes cast for the poll
+    function getPollVoteCount(uint256 externalNullifier) external view returns (uint256) {
+        return pollVotes[externalNullifier].length;
+    }
+
+    /// @notice Check if a nullifier has been used
+    /// @param nullifierHash The nullifier to check
+    /// @return True if the nullifier has been used
+    function isNullifierUsed(uint256 nullifierHash) external view returns (bool) {
+        return usedNullifiers[nullifierHash];
     }
 }
