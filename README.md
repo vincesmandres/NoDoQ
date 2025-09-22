@@ -55,6 +55,6 @@ pnpm app:dev
 
 - Ensure Node.js and pnpm are installed via official installers.
 - For Circom compilation issues, verify Rust toolchain is properly set up.
-- If Hardhat deployment fails, check your Sepolia RPC endpoint and private key configuration.
+- If Hardhat deployment fails, check your Sepolia RPC endpoint and private key configuration. Set environment variables: `SEPOLIA_RPC_URL` and `PRIVATE_KEY`.
 - Use `pnpm --version` to confirm pnpm is available in PowerShell.
 - For WASM-related errors, ensure Emscripten is installed if compiling custom circuits.
