@@ -188,127 +188,182 @@ export default function Page() {
 
   if (currentView === "connect") {
     return (
-      <main style={{ padding: 24 }}>
-        <h1>NoDoQ — Frontend</h1>
-        <button onClick={connectWallet} style={{ padding: 8, fontSize: 16 }}>
-          Connect MetaMask
-        </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </main>
+      <div className="container">
+        <header className="header">
+          <h1>NoDoQ — City Voting System</h1>
+          <p>Secure, decentralized neighborhood voting powered by blockchain</p>
+        </header>
+        <div className="card">
+          <h2>Connect Your Wallet</h2>
+          <p>To participate in the voting process, please connect your MetaMask wallet.</p>
+          <button className="btn-primary" onClick={connectWallet} style={{ marginTop: 20 }}>
+            Connect MetaMask
+          </button>
+          {error && <div className="error">{error}</div>}
+        </div>
+      </div>
     );
   }
 
   if (currentView === "welcome") {
     return (
-      <main style={{ padding: 24 }}>
-        <h1>Welcome to City Voting</h1>
-        <p>Participate in your neighborhood's democratic decisions.</p>
-        <button onClick={handleSignUp} style={{ padding: 8, fontSize: 16, marginRight: 8 }}>
-          SIGN UP
-        </button>
-        <button onClick={handleVoting} style={{ padding: 8, fontSize: 16 }}>
-          VOTING
-        </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </main>
+      <div className="container">
+        <header className="header">
+          <h1>Welcome to City Voting</h1>
+          <p>Participate in your neighborhood's democratic decisions.</p>
+        </header>
+        <div className="grid">
+          <div className="card">
+            <h3>Register</h3>
+            <p>Sign up with your ID and neighborhood to participate in voting.</p>
+            <button className="btn-primary" onClick={handleSignUp} style={{ marginTop: 20 }}>
+              SIGN UP
+            </button>
+          </div>
+          <div className="card">
+            <h3>Vote</h3>
+            <p>Cast your votes on current neighborhood issues.</p>
+            <button className="btn-primary" onClick={handleVoting} style={{ marginTop: 20 }}>
+              VOTING
+            </button>
+          </div>
+        </div>
+        {error && <div className="error">{error}</div>}
+      </div>
     );
   }
 
   if (currentView === "signup") {
     return (
-      <main style={{ padding: 24 }}>
-        <h1>Welcome to Registration</h1>
-        <p>Please enter your details to register with your wallet.</p>
-        <input
-          type="text"
-          placeholder="ID (10 digits)"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-          style={{ display: 'block', marginBottom: 8 }}
-        />
-        <select
-          value={selectedNeighborhood}
-          onChange={(e) => setSelectedNeighborhood(e.target.value)}
-          style={{ display: 'block', marginBottom: 8 }}
-        >
-          <option value="">Select Neighborhood</option>
-          {neighborhoods.map((n) => (
-            <option key={n} value={n}>{n}</option>
-          ))}
-        </select>
-        <button onClick={() => submitSignUp(id, selectedNeighborhood)} style={{ padding: 8, fontSize: 16 }}>
-          Register
-        </button>
-        <button onClick={() => setCurrentView("welcome")} style={{ padding: 8, fontSize: 16, marginLeft: 8 }}>
-          Back
-        </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </main>
+      <div className="container">
+        <header className="header">
+          <h1>Registration</h1>
+          <p>Please enter your details to register with your wallet.</p>
+        </header>
+        <div className="card">
+          <div className="form-group">
+            <label htmlFor="id">ID (10 digits)</label>
+            <input
+              id="id"
+              type="text"
+              placeholder="Enter your 10-digit ID"
+              value={id}
+              onChange={(e) => setId(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="neighborhood">Neighborhood</label>
+            <select
+              id="neighborhood"
+              value={selectedNeighborhood}
+              onChange={(e) => setSelectedNeighborhood(e.target.value)}
+            >
+              <option value="">Select Neighborhood</option>
+              {neighborhoods.map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
+          <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+            <button className="btn-primary" onClick={() => submitSignUp(id, selectedNeighborhood)}>
+              Register
+            </button>
+            <button className="btn-secondary" onClick={() => setCurrentView("welcome")}>
+              Back
+            </button>
+          </div>
+          {error && <div className="error">{error}</div>}
+        </div>
+      </div>
     );
   }
 
   if (currentView === "voting") {
     return (
-      <main style={{ padding: 24 }}>
-        <h1>Voting</h1>
-        <p>Your neighborhood: {neighborhood}</p>
-        <p>You can participate in the following votes:</p>
-        {!votedPresident && (
-          <button onClick={() => setCurrentView("presidentVote")} style={{ padding: 8, fontSize: 16, marginRight: 8 }}>
-            Vote for Neighborhood President
+      <div className="container">
+        <header className="header">
+          <h1>Voting Dashboard</h1>
+          <p>Your neighborhood: <strong>{neighborhood}</strong></p>
+        </header>
+        <div className="grid">
+          {!votedPresident && (
+            <div className="vote-option card" onClick={() => setCurrentView("presidentVote")}>
+              <h3>🏛️ Neighborhood President</h3>
+              <p>Choose your candidate for the neighborhood presidency.</p>
+            </div>
+          )}
+          {!votedPark && (
+            <div className="vote-option card" onClick={() => setCurrentView("parkVote")}>
+              <h3>🌳 Park Improvements</h3>
+              <p>Vote on whether to use neighborhood funds for park repairs.</p>
+            </div>
+          )}
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
+          <button className="btn-secondary" onClick={() => setCurrentView("welcome")}>
+            Back to Main Menu
           </button>
-        )}
-        {!votedPark && (
-          <button onClick={() => setCurrentView("parkVote")} style={{ padding: 8, fontSize: 16 }}>
-            Vote on Park Improvements
-          </button>
-        )}
-        <button onClick={() => setCurrentView("welcome")} style={{ padding: 8, fontSize: 16, marginTop: 16 }}>
-          Back
-        </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </main>
+        </div>
+        {error && <div className="error">{error}</div>}
+      </div>
     );
   }
 
   if (currentView === "presidentVote") {
     return (
-      <main style={{ padding: 24 }}>
-        <h1>Vote for Neighborhood President</h1>
-        <p>Choose your candidate:</p>
-        <button onClick={() => votePresident("Candidate A")} style={{ padding: 8, fontSize: 16, marginRight: 8 }}>
-          Candidate A
-        </button>
-        <button onClick={() => votePresident("Candidate B")} style={{ padding: 8, fontSize: 16, marginRight: 8 }}>
-          Candidate B
-        </button>
-        <button onClick={() => votePresident("Candidate C")} style={{ padding: 8, fontSize: 16 }}>
-          Candidate C
-        </button>
-        <button onClick={() => setCurrentView("voting")} style={{ padding: 8, fontSize: 16, marginTop: 16 }}>
-          Back
-        </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </main>
+      <div className="container">
+        <header className="header">
+          <h1>Vote for Neighborhood President</h1>
+          <p>Choose your candidate for the neighborhood presidency.</p>
+        </header>
+        <div className="grid">
+          <div className="vote-option card" onClick={() => votePresident("Candidate A")}>
+            <h3>👤 Candidate A</h3>
+            <p>Experienced leader focused on community development.</p>
+          </div>
+          <div className="vote-option card" onClick={() => votePresident("Candidate B")}>
+            <h3>👤 Candidate B</h3>
+            <p>Innovative thinker promoting sustainable initiatives.</p>
+          </div>
+          <div className="vote-option card" onClick={() => votePresident("Candidate C")}>
+            <h3>👤 Candidate C</h3>
+            <p>Dedicated advocate for neighborhood safety and welfare.</p>
+          </div>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
+          <button className="btn-secondary" onClick={() => setCurrentView("voting")}>
+            Back to Voting
+          </button>
+        </div>
+        {error && <div className="error">{error}</div>}
+      </div>
     );
   }
 
   if (currentView === "parkVote") {
     return (
-      <main style={{ padding: 24 }}>
-        <h1>Vote on Park Improvements</h1>
-        <p>Do you agree to use neighborhood funds for park repairs?</p>
-        <button onClick={() => votePark("Yes")} style={{ padding: 8, fontSize: 16, marginRight: 8 }}>
-          Yes
-        </button>
-        <button onClick={() => votePark("No")} style={{ padding: 8, fontSize: 16 }}>
-          No
-        </button>
-        <button onClick={() => setCurrentView("voting")} style={{ padding: 8, fontSize: 16, marginTop: 16 }}>
-          Back
-        </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </main>
+      <div className="container">
+        <header className="header">
+          <h1>Vote on Park Improvements</h1>
+          <p>Do you agree to use neighborhood funds for park repairs and maintenance?</p>
+        </header>
+        <div className="grid">
+          <div className="vote-option card" onClick={() => votePark("Yes")}>
+            <h3>✅ Yes</h3>
+            <p>Support the use of funds for park improvements.</p>
+          </div>
+          <div className="vote-option card" onClick={() => votePark("No")}>
+            <h3>❌ No</h3>
+            <p>Do not support the use of funds for park improvements.</p>
+          </div>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
+          <button className="btn-secondary" onClick={() => setCurrentView("voting")}>
+            Back to Voting
+          </button>
+        </div>
+        {error && <div className="error">{error}</div>}
+      </div>
     );
   }
 
