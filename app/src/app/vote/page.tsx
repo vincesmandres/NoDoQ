@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { proveMembership } from '../../lib/zk';
+import type { MembershipProof } from '../../lib/zk';
 import { castVoteEVM } from '../../lib/evm';
 
 export default function VotePage() {
   const [externalNullifier, setExternalNullifier] = useState('');
   const [signal, setSignal] = useState('');
-  const [proof, setProof] = useState<any>(null);
+  const [proof, setProof] = useState<MembershipProof | null>(null);
   const [generating, setGenerating] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [txHash, setTxHash] = useState<string>('');
