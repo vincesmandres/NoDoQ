@@ -22,25 +22,15 @@ New-Item -ItemType Directory -Force -Path app\src\lib | Out-Null
 # 4) .gitkeep para asegurar estructura
 New-Item -ItemType File -Force -Path zk\circuits\.gitkeep | Out-Null
 New-Item -ItemType File -Force -Path zk\build\.gitkeep    | Out-Null
+New-Item -ItemType File -Force -Path zk\scripts\.gitkeep  | Out-Null
 New-Item -ItemType File -Force -Path contracts\src\.gitkeep | Out-Null
 New-Item -ItemType File -Force -Path app\src\lib\.gitkeep | Out-Null
 
-# 5) README mínimo si no existe
-if (-not (Test-Path "README.md")) {
-@"
-# NoDoQ — ZK Voting (Semaphore-style)
-MVP web3-first para ZKMonk: anonimato + unicidad (nullifier), verificación on-chain EVM.
-- zk/: circuitos y build (wasm, zkey, vkey)
-- contracts/: Verifier + NoDoAnchor
-- app/: Next.js UI (MetaMask + 'cara' Sui opcional)
-
-## Quickstart
-pnpm i
-pnpm zk:compile
-pnpm contracts:build
-pnpm contracts:deploy --network <testnet>
-pnpm app:dev
-"@ | Set-Content -Encoding UTF8 README.md
-}
+# 5) Resumen final con conteo de archivos
+$fileCount = (Get-ChildItem -Recurse -File | Measure-Object).Count
+$dirCount = (Get-ChildItem -Recurse -Directory | Measure-Object).Count
 
 Write-Host "✅ Poda y estructura listas."
+Write-Host "📊 Resumen:"
+Write-Host "   - Archivos totales: $fileCount"
+Write-Host "   - Directorios totales: $dirCount"
