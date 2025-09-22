@@ -1,4 +1,6 @@
 import { ethers } from 'ethers';
+import type { Eip1193Provider } from 'ethers';
+import type { MembershipProof } from './zk';
 
 const abi = [
   {
@@ -23,20 +25,12 @@ export async function castVoteEVM({
   args
 }: {
   address: string;
-  args: {
-    a: bigint[];
-    b: bigint[][];
-    c: bigint[];
-    root: bigint;
-    nullifierHash: bigint;
-    signalHash: bigint;
-    externalNullifier: bigint;
-  };
+  args: MembershipProof;
 }) {
-  // Assuming MetaMask or wallet is available
-  if (!(window as any).ethereum) throw new Error('No wallet found');
+  const { ethereum } = window as typeof window & { ethereum?: Eip1193Provider };
+  if (!ethereum) throw new Error('No wallet found');
 
-  const provider = new ethers.BrowserProvider((window as any).ethereum);
+  const provider = new ethers.BrowserProvider(ethereum);
   const signer = await provider.getSigner();
   const contract = new ethers.Contract(address, abi, signer);
 

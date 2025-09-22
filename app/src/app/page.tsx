@@ -2,15 +2,13 @@
 "use client";
 import { useState } from "react";
 import { ethers } from "ethers";
+import type { Eip1193Provider } from "ethers";
 
-interface EthereumProvider {
-  isMetaMask?: boolean;
-  request?: (args: { method: string; params?: Array<any> }) => Promise<any>;
-}
+type ExtendedEthereumProvider = Eip1193Provider & { isMetaMask?: boolean };
 
 declare global {
   interface Window {
-    ethereum?: EthereumProvider;
+    ethereum?: ExtendedEthereumProvider;
   }
 }
 
@@ -24,8 +22,8 @@ export default function Page() {
       return;
     }
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const accounts = await provider.send("eth_requestAccounts", []);
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const accounts = (await provider.send("eth_requestAccounts", [])) as string[];
       setAccount(accounts[0]);
       setError(null);
     } catch (err) {
