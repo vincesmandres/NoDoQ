@@ -31,5 +31,10 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
-  }
+  },
+  "description": "Backend para el proyecto NoDo. Provee:\r - Endpoint para enviar votos con prueba ZK (verificación off-chain)\r - Prevención de doble voto mediante nullifiers en Redis\r - Persistencia de votos en Postgres\r - Batch worker para anclar batches en contrato NoDoAnchor",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
 }

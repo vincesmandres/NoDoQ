@@ -1,0 +1,23 @@
+{
+  "name": "nodoq-zk",
+  "version": "1.0.0",
+  "type": "commonjs",
+  
+  "scripts": {
+    "compile": "ts-node ./scripts/compile.ts",
+    "setup": "ts-node ./scripts/setup.ts",
+    "prove": "ts-node ./scripts/prove.ts",
+    "verify": "ts-node ./scripts/verify.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "snarkjs": "^0.7.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2",
+    "circomlib": "^2.0.5"
+  },
+  "dependencies": {
+    "@zk-kit/incremental-merkle-tree": "^1.0.0",
+    "circomlibjs": "^0.1.7"
+  }
+}
