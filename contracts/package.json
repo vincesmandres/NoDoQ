@@ -5,8 +5,8 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "deploy": "hardhat run scripts/deploy.js",
-    "contracts:deploy": "hardhat run scripts/deploy.js",
+    "deploy": "hardhat run scripts/deploy.ts",
+    "contracts:deploy": "hardhat run scripts/deploy.ts",
     "contracts:address": "node scripts/address.js"
   },
   "devDependencies": {

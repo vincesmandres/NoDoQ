@@ -1,23 +1,22 @@
-const hre = require("hardhat");
-const fs = require("fs");
-const path = require("path");
+import { ethers, network, artifacts } from "hardhat";
+import * as fs from "fs";
+import * as path from "path";
 
 async function main() {
-  console.log(`Deploying to network: ${hre.network.name}`);
+  console.log(`Deploying to network: ${network.name}`);
 
   try {
     // Get the deployer account
-    const signers = await hre.ethers.getSigners();
-    const deployer = signers[0];
+    const [deployer] = await ethers.getSigners();
     console.log(`Deploying with account: ${deployer.address}`);
 
     // Deploy MockVerifier first (placeholder for real verifier)
     console.log("\n1. Deploying MockVerifier (placeholder)...");
-    const MockVerifier = await hre.ethers.getContractFactory("MockVerifier");
+    const MockVerifier = await ethers.getContractFactory("MockVerifier");
     const mockVerifier = await MockVerifier.deploy();
-    await mockVerifier.deployed();
+    await mockVerifier.waitForDeployment();
 
-    const verifierAddress = mockVerifier.address;
+    const verifierAddress = await mockVerifier.getAddress();
     console.log(`MockVerifier deployed to: ${verifierAddress}`);
 
     // Set the verifier to return true for testing
@@ -26,23 +25,23 @@ async function main() {
 
     // Deploy NoDoAnchor with the verifier address
     console.log("\n2. Deploying NoDoAnchor...");
-    const NoDoAnchor = await hre.ethers.getContractFactory("NoDoAnchor");
+    const NoDoAnchor = await ethers.getContractFactory("NoDoAnchor");
     const noDoAnchor = await NoDoAnchor.deploy(verifierAddress);
-    await noDoAnchor.deployed();
+    await noDoAnchor.waitForDeployment();
 
-    const noDoAnchorAddress = noDoAnchor.address;
+    const noDoAnchorAddress = await noDoAnchor.getAddress();
     console.log(`NoDoAnchor deployed to: ${noDoAnchorAddress}`);
 
     // Get contract ABI for saving
-    const noDoAnchorArtifact = await hre.artifacts.readArtifact("NoDoAnchor");
+    const noDoAnchorArtifact = await artifacts.readArtifact("NoDoAnchor");
 
     // Create deployment info
     const deploymentInfo = {
       address: noDoAnchorAddress,
       abiShort: noDoAnchorArtifact.abi,
       network: {
-        name: hre.network.name,
-        chainId: hre.network.config.chainId
+        name: network.name,
+        chainId: network.config.chainId
       },
       verifier: {
         address: verifierAddress,
@@ -53,7 +52,7 @@ async function main() {
     };
 
     // Create deployments directory structure
-    const deploymentsDir = path.join(__dirname, "../deployments", hre.network.name);
+    const deploymentsDir = path.join(__dirname, "../deployments", network.name);
     if (!fs.existsSync(deploymentsDir)) {
       fs.mkdirSync(deploymentsDir, { recursive: true });
     }
@@ -69,7 +68,7 @@ async function main() {
     console.log(`\n📋 Deployment Summary:`);
     console.log(`   Verifier (Mock): ${verifierAddress}`);
     console.log(`   NoDoAnchor: ${noDoAnchorAddress}`);
-    console.log(`   Network: ${hre.network.name} (${hre.network.config.chainId})`);
+    console.log(`   Network: ${network.name} (${network.config.chainId})`);
     console.log(`   Deployer: ${deployer.address}`);
 
     console.log(`\n🔄 To replace MockVerifier with real verifier:`);
@@ -78,7 +77,7 @@ async function main() {
     console.log(`   3. Call setVerifier() on NoDoAnchor with the new verifier address`);
     console.log(`   4. Update the deployment JSON with the new verifier info`);
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Deployment failed:", error.message);
     console.error("Full error:", error);
     process.exit(1);
