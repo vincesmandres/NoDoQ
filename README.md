@@ -24,7 +24,8 @@ sin revelar su identidad ni su ubicación.
 1. Login vía Auth3 (ej: SMS / social login).  
 2. El sistema emite una credencial verificable (VC) de pertenencia al padrón de la parroquia.  
 3. Usuario genera una prueba ZK: `membership + nullifier(epoch,pollId)`.  
-4. El backend **aggregator** verifica off-chain, marca nullifier y agrega el voto.  
+4. El backend **aggregator** verifica off-chai
+n, marca nullifier y agrega el voto.  
 5. Cada batch se ancla en zkEVM testnet como `VoteAnchored(root, batchHash)`.  
 6. El panel muestra conteo y enlace a la transacción.
 

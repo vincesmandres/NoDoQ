@@ -1,8 +1,7 @@
-import { execSync } from "child_process";
-import { mkdirSync } from "fs";
-
-mkdirSync("build", { recursive: true });
-
-// Usa "npx circom" para garantizar que se resuelva el binario
-execSync("npx circom circuits/semaphore_mvp.circom --r1cs --wasm --sym -o build", { stdio: "inherit" });
-console.log("✅ Compilado: build/*.r1cs, build/*_js/semaphore_mvp.wasm, build/*.sym");
+// zk/scripts/compile.ts
+import { execSync } from "node:child_process";
+import { mkdirSync } from "node:fs";
+mkdirSync("zk/build", { recursive: true });
+execSync(`circom zk/circuits/membership.circom --r1cs --wasm --sym -o zk/build`, { stdio:"inherit" });
+execSync(`snarkjs plonk setup zk/build/membership.r1cs zk/build/pot12.ptau zk/build/membership.zkey`, { stdio:"inherit" });
+execSync(`snarkjs zkey export verificationkey zk/build/membership.zkey zk/build/verification_key.json`, { stdio:"inherit" });
