@@ -68,14 +68,14 @@ NoDoQ combines blockchain technology with zero-knowledge cryptography to create 
 ## Architecture Overview
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Web Client    │    │     Backend     │    │   Smart         │
-│   (Next.js)     │◄──►│  (Node/Express) │◄──►│   Contracts     │
-│                 │    │                 │    │   (Solidity)    │
-│ • User Interface│    │ • Vote Aggregation│    │ • Batch Anchor │
-│ • Proof Gen     │    │ • Nullifier Check │    │ • Verification │
-│ • Wallet Connect│    │ • Redis Cache     │    │ • Events       │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+┌─────────────────┐    ┌───────────────────┐    ┌─────────────────┐
+│   Web Client    │    │     Backend       │    │   Smart         │
+│   (Next.js)     │◄──►│  (Node/Express)   │◄──►│   Contracts     │
+│                 │    │                   │    │   (Solidity)    │
+│ • User Interface│    │ • Vote Aggregation│    │ • Batch Anchor  │
+│ • Proof Gen     │    │ • Nullifier Check │    │ • Verification  │ 
+│ • Wallet Connect│    │ • Redis Cache     │    │ • Events        │
+└─────────────────┘    └───────────────────┘    └─────────────────┘
          │                       │                       │
          └───────────────────────┼───────────────────────┘
                                  │
@@ -244,12 +244,6 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
-
-## Contact
-
-- Website: [https://nodoq.ec](https://nodoq.ec)
-- Twitter: [@NoDoQ_ec](https://twitter.com/NoDoQ_ec)
-- Email: hello@nodoq.ec
 
 ---
 
